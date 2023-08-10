@@ -120,7 +120,7 @@ export default function ProductPage() {
 
   const handleSelectedFile = async (e) => {
     const files = e.target.files;
-    const imagesTmp = [];
+    const imagesTmp = [...images];
     for (var i = 0; i < files.length; i++) {
       const base64 = await blobToBase64(URL.createObjectURL(files[i]));
 
@@ -464,7 +464,7 @@ export default function ProductPage() {
           }}
           onSubmit={async (values, { setSubmitting }) => {
             try {
-              const image = images.length && images[0].file || ""
+              const image = images.map(im=>({file:im.file}))
                 await addProduct({...values, image, features});
                 success("Product added successfully")
                 getData();
@@ -599,7 +599,7 @@ export default function ProductPage() {
                 {errors.categories && touched.categories && errors.categories}
                 <FormControl style={{width: "100%", marginTop: '0.5rem'}}> 
                   Images
-        <Input type="file" id="images" onChange={handleSelectedFile} />
+        <Input type="file" id="images" onChange={handleSelectedFile} multiple />
         {images.length ? (
               <div className="flex-container">
                 {images.map((imgData, i) => (
