@@ -42,7 +42,7 @@ import { error, success } from 'src/utils/toast';
 
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
-  { id: 'brand', label: 'Brand', alignRight: false },
+  { id: 'name', label: 'Brand', alignRight: false },
   { id: 'created_at', label: 'Created At', alignRight: false },
   { id: 'updated_at', label: 'Updated At', alignRight: false },
   { id: '' },

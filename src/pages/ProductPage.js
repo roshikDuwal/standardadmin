@@ -48,9 +48,9 @@ import { getCategory } from 'src/services/category';
 
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'brand', label: 'Brand', alignRight: false },
-  { id: 'category', label: 'Category', alignRight: false },
+  { id: 'title', label: 'Name', alignRight: false },
+  { id: 'brand_id', label: 'Brand', alignRight: false },
+  { id: 'categories', label: 'Categories', alignRight: false },
   { id: 'description', label: 'Description', alignRight: false },
   { id: 'quantity', label: 'Stock', alignRight: false },
   { id: 'regular_price', label: 'Regular Price', alignRight: false },
@@ -97,10 +97,11 @@ export default function ProductPage() {
     const [productlist, setProductlist] = useState([]);
     const [categorylist, setCategorylist] = useState([]);
     const [brandlist, setBrandlist] = useState([]);
+    const [features, setFeatures] = useState([{name:"", description:""}]);
 
-  const [openAdd, setOpenAdd] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [images, setImages] = useState([]);
+    const [openAdd, setOpenAdd] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [images, setImages] = useState([]);
 
   const blobToBase64 = async (url) => {
     return new Promise((resolve, _) => {
@@ -119,7 +120,7 @@ export default function ProductPage() {
 
   const handleSelectedFile = async (e) => {
     const files = e.target.files;
-    const imagesTmp = [...images];
+    const imagesTmp = [];
     for (var i = 0; i < files.length; i++) {
       const base64 = await blobToBase64(URL.createObjectURL(files[i]));
 
@@ -146,6 +147,7 @@ export default function ProductPage() {
 
   const handleClose = () => {
     setImages([]);
+    setFeatures([{name:"", description:""}])
     setOpenAdd(false);
   };
 
@@ -283,7 +285,7 @@ export default function ProductPage() {
 
                         <TableCell component="th" scope="row" padding="normal">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Typography variant="subtitle2" noWrap>
+                            <Typography variant="subtitle2" >
                               {title}
                             </Typography>
                           </Stack>
@@ -301,18 +303,14 @@ export default function ProductPage() {
                         </TableCell>
                         <TableCell component="th" scope="row" padding="normal">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Typography variant="subtitle2" noWrap>
-                            {categorylist.map(category => {
-                                if(categories.includes(category.value)) {
-                                  return category.label
-                                }
-                              })}
+                            <Typography variant="subtitle2" >
+                            {categories.map(cat=>cat.title).join(",")}
                             </Typography>
                           </Stack>
                         </TableCell>
                         <TableCell component="th" scope="row" padding="normal">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Typography variant="subtitle2" noWrap>
+                            <Typography variant="subtitle2" >
                               {description}
                             </Typography>
                           </Stack>
@@ -466,7 +464,8 @@ export default function ProductPage() {
           }}
           onSubmit={async (values, { setSubmitting }) => {
             try {
-                await addProduct({...values, images:images.map(img=>img.file)});
+              const image = images.length && images[0].file || ""
+                await addProduct({...values, image, features});
                 success("Product added successfully")
                 getData();
 
@@ -599,8 +598,8 @@ export default function ProductPage() {
                 </FormControl>
                 {errors.categories && touched.categories && errors.categories}
                 <FormControl style={{width: "100%", marginTop: '0.5rem'}}> 
-                  <InputLabel htmlFor='images'>Images</InputLabel>
-        <Input type="file" id="images" onChange={handleSelectedFile} multiple />
+                  Images
+        <Input type="file" id="images" onChange={handleSelectedFile} />
         {images.length ? (
               <div className="flex-container">
                 {images.map((imgData, i) => (
@@ -622,7 +621,56 @@ export default function ProductPage() {
               </div>
             ) : null}
                 </FormControl>
-              
+                <FormControl style={{width: "100%", marginTop: '0.5rem'}}> 
+                Features
+                </FormControl>
+                  {features.map((ft, index) => (
+<>
+                    <TextField
+                    autoFocus
+                    margin="dense"
+                    label="Name"
+                    type="text"
+                    name="quantity"
+                    variant="standard"
+                    onChange={(e) => {
+                      setFeatures([
+                            ...features.slice(0, index),
+                            {...features[index], name:e.target.value},
+                            ...features.slice(index + 1)
+                          ])
+                    }}
+                    onBlur={handleBlur}
+                    value={ft.name}
+                    />
+                    <TextField
+                    autoFocus
+                    margin="dense"
+                    label="Description"
+                    type="text"
+                    name="description"
+                    variant="standard"
+                    onChange={(e) => {
+                      setFeatures([
+                            ...features.slice(0, index),
+                            {...features[index], description:e.target.value},
+                            ...features.slice(index + 1)
+                          ])
+                    }}
+                    onBlur={handleBlur}
+                    value={ft.description}
+                    /></>
+                  ))
+                  }
+                <FormControl style={{width: "100%", marginTop: '0.5rem'}}> 
+              <Button
+                onClick={() => {
+                  setFeatures([...features, {name: "", description: ""}])
+                }}
+              >
+                Add Features
+              </Button>
+        </FormControl>
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
