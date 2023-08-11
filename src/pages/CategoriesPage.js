@@ -418,7 +418,7 @@ export default function CategoryPage() {
                   autoFocus
                   margin="dense"
                   id="name"
-                  label="Category name"
+                  label="Category description"
                   type="text"
                   fullWidth
                   name="description"
