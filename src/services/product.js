@@ -11,3 +11,7 @@ export const getProduct = async () => {
     const res = await axios.get(`${BASE_URL}product/index`);
     return res.data.product
 }
+export const deleteProduct = async (id) => {
+    const res = await axios.delete(`${BASE_URL}product/delete/${id}`);
+    return res
+}

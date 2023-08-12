@@ -3,6 +3,8 @@ import { Formik } from 'formik';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useEffect, useState } from 'react';
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 // @mui
 import {
   Card,
@@ -35,7 +37,7 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { CategoryListHead, CategoryListToolbar } from '../sections/@dashboard/category';
-import { addCategory, getCategory } from '../services/category';
+import { addCategory, getCategory, deleteCategory } from '../services/category';
 import { error, success } from 'src/utils/toast';
 // mock
 // ----------------------------------------------------------------------
@@ -86,12 +88,15 @@ export default function CategoryPage() {
 
   const [openAdd, setOpenAdd] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [actionCategory, setActionCategory] = useState();
+  const [edit, setEdit] = useState(false);
 
   const handleClickOpen = () => {
     setOpenAdd(true);
   };
 
   const handleClose = () => {
+    setEdit(false);
     setOpenAdd(false);
   };
 
@@ -109,6 +114,35 @@ export default function CategoryPage() {
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
+  };
+
+  const deleteConfirm = (e) => {
+    e.stopPropagation();
+    handleCloseMenu();
+    confirmAlert({
+      title: "Are you sure to delete category?",
+      message: "The data will be lost forever.",
+      buttons: [
+        {
+          label: "Delete",
+          onClick: async () => {
+            setLoading(true);
+            try {
+                await deleteCategory(actionCategory?.id)
+                success("Category deleted successfully")
+                await getData();
+            } catch (e) {
+                error(e.message || "Failed to delete category")
+            }
+            setLoading(false);
+          },
+        },
+        {
+          label: "Cancel",
+          onClick: () => {},
+        },
+      ],
+    });
   };
 
   const handleCloseMenu = () => {
@@ -243,7 +277,9 @@ export default function CategoryPage() {
                         <TableCell align="left">{new Date(updated_at).toLocaleDateString() || "-"}</TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          <IconButton size="large" color="inherit" onClick={(e)=>{
+                            setActionCategory({...row})
+                            handleOpenMenu(e)}}>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -347,19 +383,19 @@ export default function CategoryPage() {
           },
         }}
       >
-        <MenuItem>
+        <MenuItem onClick={()=>{handleCloseMenu();setEdit(true)}}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
+        <MenuItem sx={{ color: 'error.main' }} onClick={deleteConfirm}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Delete
         </MenuItem>
       </Popover>
-      <Dialog open={openAdd} onClose={handleClose}>
+      <Dialog open={openAdd || edit} onClose={handleClose}>
         <Formik
-          initialValues={{ title: '', description: '' }}
+          initialValues={edit ? actionCategory :{ title: '', description: '' }}
           validate={(values) => {
             const errors = {};
             if (!values.title) {
@@ -372,13 +408,21 @@ export default function CategoryPage() {
           }}
           onSubmit={async (values, { setSubmitting }) => {
             try {
+              if(edit) {
+                success("Category updated successfully")
+              } else {
                 await addCategory(values);
                 success("Category added successfully");
+              }
                 getData();
             handleClose();
 
             } catch (e) {
+              if(edit) {
+                error(e.message || "Failed to update category")
+              } else {
                 error(e.message || "Failed to add category")
+              }
             }
             setSubmitting(false);
           }}
@@ -394,7 +438,7 @@ export default function CategoryPage() {
             /* and other goodies */
           }) => (
             <form onSubmit={handleSubmit}>
-              <DialogTitle>Add Category</DialogTitle>
+              <DialogTitle>{edit ? "Edit Category" : "Add Category"}</DialogTitle>
               <DialogContent>
                 {/* <DialogContentText>
             To subscribe to this website, please enter your name address here. We
@@ -431,7 +475,7 @@ export default function CategoryPage() {
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button disabled={isSubmitting} type='submit'>Add</Button>
+                <Button disabled={isSubmitting} type='submit'>{edit ? "Edit" : "Add"}</Button>
               </DialogActions>
             </form>
           )}

@@ -3,6 +3,8 @@ import { Formik } from 'formik';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useEffect, useState } from 'react';
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 // @mui
 import {
   Card,
@@ -39,7 +41,7 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { ProductListHead, ProductListToolbar } from '../sections/@dashboard/product';
-import { addProduct, getProduct } from '../services/product';
+import { addProduct, deleteProduct, getProduct } from '../services/product';
 import { error, success } from 'src/utils/toast';
 import { getBrand } from 'src/services/brand';
 import { getCategory } from 'src/services/category';
@@ -97,6 +99,8 @@ export default function ProductPage() {
     const [productlist, setProductlist] = useState([]);
     const [categorylist, setCategorylist] = useState([]);
     const [brandlist, setBrandlist] = useState([]);
+    const [actionProduct, setActionProduct] = useState();
+    const [edit, setEdit] = useState(false);
     const [features, setFeatures] = useState([{name:"", description:""}]);
 
     const [openAdd, setOpenAdd] = useState(false);
@@ -149,6 +153,7 @@ export default function ProductPage() {
     setImages([]);
     setFeatures([{name:"", description:""}])
     setOpenAdd(false);
+    setEdit(false);
   };
 
   const [page, setPage] = useState(0);
@@ -239,6 +244,35 @@ export default function ProductPage() {
   useEffect(() => {
     getData();
   },[])
+
+  const deleteConfirm = (e) => {
+    e.stopPropagation();
+    handleCloseMenu();
+    confirmAlert({
+      title: "Are you sure to delete product?",
+      message: "The data will be lost forever.",
+      buttons: [
+        {
+          label: "Delete",
+          onClick: async () => {
+            setLoading(true);
+            try {
+                await deleteProduct(actionProduct?.id)
+                success("Product deleted successfully")
+                await getData();
+            } catch (e) {
+                error(e.message || "Failed to delete product")
+            }
+            setLoading(false);
+          },
+        },
+        {
+          label: "Cancel",
+          onClick: () => {},
+        },
+      ],
+    });
+  };
 
   return (
     <>
@@ -338,7 +372,12 @@ export default function ProductPage() {
                         </TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          <IconButton size="large" color="inherit" onClick={(e)=>{
+                            const categories = row.categories?.map(cat=>cat.id)
+                            // setImages(row.images)
+                            // setFeatures(row.features)
+                            setActionProduct({...row, categories})
+                            handleOpenMenu(e)}}>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -442,19 +481,20 @@ export default function ProductPage() {
           },
         }}
       >
-        <MenuItem>
+    
+        <MenuItem  onClick={()=>{handleCloseMenu();setEdit(true)}}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
+        <MenuItem sx={{ color: 'error.main' }} onClick={deleteConfirm}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Delete
         </MenuItem>
       </Popover>
-      <Dialog open={openAdd} onClose={handleClose}>
+      <Dialog open={openAdd || edit} onClose={handleClose}>
         <Formik
-          initialValues={{ title: '', description:'', categories:[] }}
+          initialValues={edit ? actionProduct : { title: '', description:'', categories:[] }}
           validate={(values) => {
             const errors = {};
             if (!values.title) {
@@ -465,14 +505,22 @@ export default function ProductPage() {
           onSubmit={async (values, { setSubmitting }) => {
             try {
               const image = images.map(im=>({file:im.file}))
+              if(edit) {
+                success("Product updated successfully")
+              } else {
                 await addProduct({...values, image, features});
                 success("Product added successfully")
+              }
                 getData();
 
             handleClose();
 
             } catch (e) {
+              if(edit) {
+                error(e.message || "Failed to update product")
+              } else {
                 error(e.message || "Failed to add product")
+              }
             }
             setSubmitting(false);
           }}
@@ -488,7 +536,7 @@ export default function ProductPage() {
             /* and other goodies */
           }) => (
             <form onSubmit={handleSubmit}>
-              <DialogTitle>Add Product</DialogTitle>
+              <DialogTitle>{edit ? "Edit Product" : "Add Product"}</DialogTitle>
               <DialogContent>
                 {/* <DialogContentText>
             To subscribe to this website, please enter your name address here. We
@@ -674,7 +722,7 @@ export default function ProductPage() {
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button disabled={isSubmitting} type='submit'>Add</Button>
+                <Button disabled={isSubmitting} type='submit'>{edit ? "Update" : "Add"}</Button>
               </DialogActions>
             </form>
           )}

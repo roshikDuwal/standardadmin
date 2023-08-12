@@ -3,6 +3,8 @@ import { Formik } from 'formik';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useEffect, useState } from 'react';
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 // @mui
 import {
   Card,
@@ -35,7 +37,7 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { BrandListHead, BrandListToolbar } from '../sections/@dashboard/brand';
-import { addBrand, getBrand } from '../services/brand';
+import { addBrand, getBrand, deleteBrand } from '../services/brand';
 import { error, success } from 'src/utils/toast';
 // mock
 // ----------------------------------------------------------------------
@@ -85,12 +87,15 @@ export default function BrandPage() {
 
   const [openAdd, setOpenAdd] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [actionBrand, setActionBrand] = useState();
+  const [edit, setEdit] = useState(false);
 
   const handleClickOpen = () => {
     setOpenAdd(true);
   };
 
   const handleClose = () => {
+    setEdit(false);
     setOpenAdd(false);
   };
 
@@ -112,6 +117,35 @@ export default function BrandPage() {
 
   const handleCloseMenu = () => {
     setOpen(null);
+  };
+
+  const deleteConfirm = (e) => {
+    e.stopPropagation();
+    handleCloseMenu();
+    confirmAlert({
+      title: "Are you sure to delete brand?",
+      message: "The data will be lost forever.",
+      buttons: [
+        {
+          label: "Delete",
+          onClick: async () => {
+            setLoading(true);
+            try {
+                await deleteBrand(actionBrand?.id)
+                success("Brand deleted successfully")
+                await getData();
+            } catch (e) {
+                error(e.message || "Failed to delete brand")
+            }
+            setLoading(false);
+          },
+        },
+        {
+          label: "Cancel",
+          onClick: () => {},
+        },
+      ],
+    });
   };
 
   const handleRequestSort = (event, property) => {
@@ -235,7 +269,9 @@ export default function BrandPage() {
                         <TableCell align="left">{new Date(updated_at).toLocaleDateString() || "-"}</TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          <IconButton size="large" color="inherit" onClick={(e)=>{
+                            setActionBrand({...row})
+                            handleOpenMenu(e)}}>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -339,19 +375,19 @@ export default function BrandPage() {
           },
         }}
       >
-        <MenuItem>
+        <MenuItem  onClick={()=>{handleCloseMenu();setEdit(true)}}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
+        <MenuItem sx={{ color: 'error.main' }} onClick={deleteConfirm}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Delete
         </MenuItem>
       </Popover>
-      <Dialog open={openAdd} onClose={handleClose}>
+      <Dialog open={openAdd || edit} onClose={handleClose}>
         <Formik
-          initialValues={{ name: '' }}
+          initialValues={edit ? actionBrand : { name: '' }}
           validate={(values) => {
             const errors = {};
             if (!values.name) {
@@ -361,14 +397,22 @@ export default function BrandPage() {
           }}
           onSubmit={async (values, { setSubmitting }) => {
             try {
+              if(edit) {
+                success("Brand updated successfully")
+              } else {
                 await addBrand(values);
                 success("Brand added successfully")
+              }
                 getData();
 
             handleClose();
 
             } catch (e) {
+              if(edit) {
+                error(e.message || "Failed to update brand")
+              } else {
                 error(e.message || "Failed to add brand")
+              }
             }
             setSubmitting(false);
           }}
@@ -384,7 +428,7 @@ export default function BrandPage() {
             /* and other goodies */
           }) => (
             <form onSubmit={handleSubmit}>
-              <DialogTitle>Add Brand</DialogTitle>
+              <DialogTitle>{edit ? "Edit Brand" : "Add Brand"}</DialogTitle>
               <DialogContent>
                 {/* <DialogContentText>
             To subscribe to this website, please enter your name address here. We
@@ -407,7 +451,7 @@ export default function BrandPage() {
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button disabled={isSubmitting} type='submit'>Add</Button>
+                <Button disabled={isSubmitting} type='submit'>{edit ? "Edit" : "Add"}</Button>
               </DialogActions>
             </form>
           )}

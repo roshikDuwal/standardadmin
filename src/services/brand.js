@@ -11,3 +11,7 @@ export const getBrand = async () => {
     const res = await axios.get(`${BASE_URL}brand/index`);
     return res.data.brand
 }
+export const deleteBrand = async (id) => {
+    const res = await axios.delete(`${BASE_URL}brand/delete/${id}`);
+    return res
+}
