@@ -37,7 +37,7 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { CategoryListHead, CategoryListToolbar } from '../sections/@dashboard/category';
-import { addCategory, getCategory, deleteCategory } from '../services/category';
+import { addCategory, getCategory, deleteCategory, updateCategory } from '../services/category';
 import { error, success } from 'src/utils/toast';
 // mock
 // ----------------------------------------------------------------------
@@ -409,6 +409,7 @@ export default function CategoryPage() {
           onSubmit={async (values, { setSubmitting }) => {
             try {
               if(edit) {
+                await updateCategory(actionCategory.id, values)
                 success("Category updated successfully")
               } else {
                 await addCategory(values);

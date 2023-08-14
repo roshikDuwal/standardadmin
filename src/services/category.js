@@ -15,3 +15,7 @@ export const deleteCategory = async (id) => {
     const res = await axios.delete(`${BASE_URL}category/delete/${id}`);
     return res
 }
+export const updateCategory = async (id,data) => {
+    const res = await axios.patch(`${BASE_URL}category/update/${id}`, data);
+    return res.data
+}

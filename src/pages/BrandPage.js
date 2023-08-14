@@ -37,7 +37,7 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { BrandListHead, BrandListToolbar } from '../sections/@dashboard/brand';
-import { addBrand, getBrand, deleteBrand } from '../services/brand';
+import { addBrand, getBrand, deleteBrand, updateBrand } from '../services/brand';
 import { error, success } from 'src/utils/toast';
 // mock
 // ----------------------------------------------------------------------
@@ -398,6 +398,7 @@ export default function BrandPage() {
           onSubmit={async (values, { setSubmitting }) => {
             try {
               if(edit) {
+                await updateBrand(actionBrand.id, values)
                 success("Brand updated successfully")
               } else {
                 await addBrand(values);
