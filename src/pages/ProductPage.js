@@ -41,7 +41,7 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { ProductListHead, ProductListToolbar } from '../sections/@dashboard/product';
-import { addProduct, deleteProduct, getProduct } from '../services/product';
+import { addProduct, deleteProduct, getProduct, updateProduct } from '../services/product';
 import { error, success } from 'src/utils/toast';
 import { getBrand } from 'src/services/brand';
 import { getCategory } from 'src/services/category';
@@ -374,8 +374,8 @@ export default function ProductPage() {
                         <TableCell align="right">
                           <IconButton size="large" color="inherit" onClick={(e)=>{
                             const categories = row.categories?.map(cat=>cat.id)
-                            // setImages(row.images)
-                            // setFeatures(row.features)
+                            setImages(row.images)
+                            setFeatures(row.product_features)
                             setActionProduct({...row, categories})
                             handleOpenMenu(e)}}>
                             <Iconify icon={'eva:more-vertical-fill'} />
@@ -506,6 +506,7 @@ export default function ProductPage() {
             try {
               const image = images.map(im=>({file:im.file}))
               if(edit) {
+                await updateProduct(actionProduct.id, {...values, image, features})
                 success("Product updated successfully")
               } else {
                 await addProduct({...values, image, features});

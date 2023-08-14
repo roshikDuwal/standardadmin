@@ -15,3 +15,7 @@ export const deleteProduct = async (id) => {
     const res = await axios.delete(`${BASE_URL}product/delete/${id}`);
     return res
 }
+export const updateProduct = async (id,data) => {
+    const res = await axios.patch(`${BASE_URL}product/update/${id}`, data);
+    return res.data
+}
