@@ -30,6 +30,11 @@ const navConfig = [
     path: '/dashboard/products',
     icon: icon('ic_cart'),
   },
+  {
+    title: 'Slider',
+    path: '/dashboard/sliders',
+    icon: <SvgColor src={`/assets/icons/ic_notification_package.svg`} sx={{ width: 1, height: 1 }} />,
+  },
   // {
   //   title: 'login',
   //   path: '/login',

@@ -92,9 +92,6 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function ProductPage() {
-
-
-
     const [open, setOpen] = useState(null);
     const [productlist, setProductlist] = useState([]);
     const [categorylist, setCategorylist] = useState([]);
