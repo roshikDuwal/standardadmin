@@ -17,11 +17,39 @@ import {
   AppCurrentSubject,
   AppConversionRates,
 } from '../sections/@dashboard/app';
+import { useEffect, useState } from 'react';
+import { getProduct } from 'src/services/product';
+import { error } from 'src/utils/toast';
+import { getBrand } from 'src/services/brand';
+import { getCategory } from 'src/services/category';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
   const theme = useTheme();
+  const [productlist, setProductlist] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [categorylist, setCategorylist] = useState([]);
+  const [brandlist, setBrandlist] = useState([]);
+
+  const getData = async ()=>{
+    setLoading(true);
+    try {
+        const products = await getProduct();
+        setProductlist(products)
+        const brands = await getBrand();
+        setBrandlist(brands.map(brand => ({label:brand.name, value: brand.id})))
+        const categories = await getCategory();
+        setCategorylist(categories.map(category => ({label:category.title, value: category.id})))
+    } catch (e) {
+        error(e.message || "Failed to get products")
+    }
+    setLoading(false)
+    }
+
+  useEffect(() => {
+    getData();
+  },[])
 
   return (
     <>
@@ -36,20 +64,17 @@ export default function DashboardAppPage() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
+            <AppWidgetSummary title="Brands" total={brandlist.length} icon={'ant-design:android-filled'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="New Users" total={1352831} color="info" icon={'ant-design:apple-filled'} />
+            <AppWidgetSummary title="Categories" total={categorylist.length} color="info" icon={'ant-design:apple-filled'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Item Orders" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
+            <AppWidgetSummary title="Products" total={productlist.length} color="warning" icon={'ant-design:windows-filled'} />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
-          </Grid>
 {/* 
           <Grid item xs={12} md={6} lg={8}>
             <AppWebsiteVisits
