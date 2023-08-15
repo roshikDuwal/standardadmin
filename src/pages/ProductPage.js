@@ -371,7 +371,7 @@ export default function ProductPage() {
                         <TableCell align="right">
                           <IconButton size="large" color="inherit" onClick={(e)=>{
                             const categories = row.categories?.map(cat=>cat.id)
-                            setImages(row.images)
+                            // setImages(row.images)
                             setFeatures(row.product_features)
                             setActionProduct({...row, categories})
                             handleOpenMenu(e)}}>
@@ -503,7 +503,11 @@ export default function ProductPage() {
             try {
               const image = images.map(im=>({file:im.file}))
               if(edit) {
-                await updateProduct(actionProduct.id, {...values, image, features})
+                const dat= {...values, features};
+                if(image.length) {
+                  dat.image = image
+                }
+                await updateProduct(actionProduct.id, dat)
                 success("Product updated successfully")
               } else {
                 await addProduct({...values, image, features});
