@@ -35,6 +35,11 @@ const navConfig = [
     path: '/dashboard/sliders',
     icon: <SvgColor src={`/assets/icons/ic_notification_package.svg`} sx={{ width: 1, height: 1 }} />,
   },
+  {
+    title: 'Messages',
+    path: '/dashboard/messages',
+    icon: <SvgColor src={`/assets/icons/ic_notification_mail.svg`} sx={{ width: 1, height: 1 }} />,
+  },
   // {
   //   title: 'login',
   //   path: '/login',

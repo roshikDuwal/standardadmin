@@ -11,6 +11,7 @@ import BrandPage from './pages/BrandPage';
 import CategoryPage from './pages/CategoriesPage';
 import ProductPage from './pages/ProductPage';
 import SliderPage from './pages/SliderPage';
+import MessagePage from './pages/MessagePage';
 
 // ----------------------------------------------------------------------
 
@@ -27,6 +28,7 @@ export default function Router() {
         { path: 'category', element: <CategoryPage /> },
         { path: 'blog', element: <BlogPage /> },
         { path: 'sliders', element: <SliderPage /> },
+        { path: 'messages', element: <MessagePage /> },
       ],
     },
     {
