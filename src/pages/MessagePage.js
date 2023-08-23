@@ -48,7 +48,7 @@ const TABLE_HEAD = [
   { id: 'email', label: 'Email', alignRight: false },
   { id: 'phone', label: 'Phone', alignRight: false },
   { id: 'subject', label: 'Subject', alignRight: false },
-  { id: 'title', label: 'Message', alignRight: false },
+  { id: 'message', label: 'Message', alignRight: false },
   { id: 'created_at', label: 'Created At', alignRight: false },
   { id: '' },
 ];
