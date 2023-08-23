@@ -45,6 +45,7 @@ import { addProduct, deleteProduct, getProduct, updateProduct } from '../service
 import { error, success } from 'src/utils/toast';
 import { getBrand } from 'src/services/brand';
 import { getCategory } from 'src/services/category';
+import { PRODUCT_IMAGE_PATH } from 'src/config';
 // mock
 // ----------------------------------------------------------------------
 
@@ -271,6 +272,19 @@ export default function ProductPage() {
     });
   };
 
+  const getBase64FromUrl = async (url) => {
+    const data = await fetch(url);
+    const blob = await data.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(blob); 
+      reader.onloadend = () => {
+        const base64data = reader.result;   
+        resolve(base64data);
+      }
+    });
+  }
+
   return (
     <>
       <Helmet>
@@ -369,12 +383,24 @@ export default function ProductPage() {
                         </TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={(e)=>{
+                          <IconButton size="large" color="inherit" onClick={async (e)=>{
                             const categories = row.categories?.map(cat=>cat.id)
                             // setImages(row.images)
                             setFeatures(row.product_features)
                             setActionProduct({...row, categories})
-                            handleOpenMenu(e)}}>
+                            handleOpenMenu(e)
+                            const imagesTmp = [];
+                            for (var i = 0; i < row.images.length; i++) {
+                              const base64 = await getBase64FromUrl(PRODUCT_IMAGE_PATH+row.images[i].image);
+                              imagesTmp.push({
+                                file: base64,
+                                score: null,
+                                title:
+                                  row.images[i].id,
+                              });
+                            }
+                            setImages(imagesTmp);
+                          }}>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
