@@ -256,28 +256,28 @@ export default function MessagePage() {
                         </TableCell>
                         <TableCell align="left">{id.toString()}</TableCell>
 
-                        <TableCell component="th" scope="row" padding="none">
+                        <TableCell component="th" scope="row" padding="">
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Typography variant="subtitle2" noWrap>
                               {name}
                             </Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell component="th" scope="row" padding="none">
+                        <TableCell component="th" scope="row" padding="">
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Typography variant="subtitle2" noWrap>
                               {email}
                             </Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell component="th" scope="row" padding="none">
+                        <TableCell component="th" scope="row" padding="">
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Typography variant="subtitle2" noWrap>
                               {phone}
                             </Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell component="th" scope="row" padding="none">
+                        <TableCell component="th" scope="row" padding="">
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Typography variant="subtitle2" noWrap>
                               {subject}
@@ -286,7 +286,7 @@ export default function MessagePage() {
                         </TableCell>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Typography variant="subtitle2" noWrap>
+                            <Typography variant="subtitle2">
                               {message}
                             </Typography>
                           </Stack>
