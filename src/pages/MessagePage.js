@@ -46,6 +46,7 @@ const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
   { id: 'name', label: 'Name', alignRight: false },
   { id: 'email', label: 'Email', alignRight: false },
+  { id: 'phone', label: 'Phone', alignRight: false },
   { id: 'subject', label: 'Subject', alignRight: false },
   { id: 'title', label: 'Message', alignRight: false },
   { id: 'created_at', label: 'Created At', alignRight: false },
@@ -245,7 +246,7 @@ export default function MessagePage() {
                 />
                 <TableBody>
                   {filteredMessages.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, subject, name, created_at, email, message } = row;
+                    const { id, subject, name, phone, created_at, email, message } = row;
                     const selectedMessage = selected.indexOf(subject) !== -1;
 
                     return (
@@ -266,6 +267,13 @@ export default function MessagePage() {
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Typography variant="subtitle2" noWrap>
                               {email}
+                            </Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell component="th" scope="row" padding="none">
+                          <Stack direction="row" alignItems="center" spacing={2}>
+                            <Typography variant="subtitle2" noWrap>
+                              {phone}
                             </Typography>
                           </Stack>
                         </TableCell>
