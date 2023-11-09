@@ -6,6 +6,7 @@ export class Axios {
   constructor(config) {
     const a = axios.create({
       baseURL: BASE_URL,
+      // withCredentials:true
     });
     a.interceptors.response.use(
       (response) => {
